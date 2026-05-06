@@ -1,62 +1,34 @@
-export interface GameUserProfile {
-  id?: number | string;
-  authId?: string;
-  username?: string;
-  name?: string;
-  email?: string;
-  phone?: string;
-  status?: string;
-  [key: string]: unknown;
+export interface LongValue {
+    low: number;
+    high: number;
+    unsigned: boolean;
 }
 
-export interface BalanceWebInfo {
-  vangNapWeb?: number;
-  ngocNapWeb?: number;
-  [key: string]: unknown;
+export interface PlayerProfile {
+    id: number;
+    auth_id: number;
+    gameName: string;
+    mapHienTai: string;
+    vang: LongValue;
+    ngoc: LongValue;
+    sucManh: LongValue;
+    vangNapTuWeb: LongValue;
+    ngocNapTuWeb: LongValue;
+    x: number;
+    y: number;
+    coDeTu: boolean;
+    daVaoTaiKhoanLanDau: boolean;
+    danhSachVatPhamWeb: any[];
 }
 
-export interface GameItemRecord {
-  id?: number | string;
-  itemId?: number | string;
-  itemName?: string;
-  quantity?: number;
-  [key: string]: unknown;
+export interface PlayerMailPayload {
+    who: string | 'ALL';
+    title: string;
+    content: string;
 }
 
-export interface DiscipleRecord {
-  id?: number | string;
-  name?: string;
-  level?: number | string;
-  [key: string]: unknown;
-}
-
-export interface WalletInfo {
-  id?: number | string;
-  balance?: number;
-  cash?: number;
-  [key: string]: unknown;
-}
-
-export interface BanRecord {
-  userId?: number | string;
-  authId?: string;
-  username?: string;
-  reason?: string;
-  why?: string;
-  remainingMinutes?: number;
-  createdAt?: string;
-  expiredAt?: string;
-  [key: string]: unknown;
-}
-
-export interface MailFormValues {
-  who: string;
-  title: string;
-  content: string;
-}
-
-export interface BanFormValues {
-  userId: number;
-  phut: number;
-  why: string;
+export interface TemporaryBanPayload {
+    userId: number;
+    phut: number;
+    why: string;
 }

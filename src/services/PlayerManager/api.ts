@@ -28,29 +28,6 @@ export async function getPlayerProfile(id: string, token: string) {
     return axios.get(`${ipNR}/player_manager/profile/${id}`, getAuthHeader(token));
 }
 
-export async function getPlayerBalanceWeb(token: string, authId?: string) {
-    return axios.get(`${ipNR}/player_manager/balance-web`, buildQueryConfig(token, { authId }));
-}
-
-
-export async function getPlayerItemWeb(token: string, authId?: string) {
-    return axios.get(`${ipNR}/player_manager/item-web`, buildQueryConfig(token, { authId }));
-}
-
-
-export async function getPlayerUserItems(token: string, authId?: string) {
-    return axios.get(`${ipNR}/player_manager/user-items`, buildQueryConfig(token, { authId }));
-}
-
-
-export async function getPlayerDeTu(token: string, authId?: string) {
-    return axios.get(`${ipNR}/player_manager/de-tu`, buildQueryConfig(token, { authId }));
-}
-
-
-export async function getPlayerPay(token: string, authId?: string) {
-    return axios.get(`${ipNR}/player_manager/pay`, buildQueryConfig(token, { authId }));
-}
 
 
 export async function sendEmailToPlayers(
@@ -105,25 +82,6 @@ export async function getAnyPlayerProfileByAuthId(authId: string, token: string)
     return getPlayerProfile(authId, token);
 }
 
-export async function getAnyPlayerBalanceWebByAuthId(authId: string, token: string) {
-    return getPlayerBalanceWeb(token, authId);
-}
-
-export async function getAnyPlayerItemWebByAuthId(authId: string, token: string) {
-    return getPlayerItemWeb(token, authId);
-}
-
-export async function getAnyPlayerUserItemsByAuthId(authId: string, token: string) {
-    return getPlayerUserItems(token, authId);
-}
-
-export async function getAnyPlayerDeTuByAuthId(authId: string, token: string) {
-    return getPlayerDeTu(token, authId);
-}
-
-export async function getAnyPlayerWalletByAuthId(authId: string, token: string) {
-    return getPlayerPay(token, authId);
-}
 
 export async function lockPlayerTemporarily(payload: TemporaryBanPayload, token: string) {
     return temporaryBanPlayerByPayload(payload, token);

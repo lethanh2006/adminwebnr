@@ -1,13 +1,10 @@
-
 import { useEffect, useMemo, useState } from 'react';
 import {
   Button,
   Card,
   Col,
-  Input,
   InputNumber,
   Modal,
-  Radio,
   Row,
   Space,
   Tabs,
@@ -17,13 +14,11 @@ import {
 import { useSearchParams } from '@umijs/max';
 import {
   buyAccountSellV2,
-  confirmSellByEmailLink,
   createAccountSellV2,
   deleteAccountSellV2,
   getAccountSellByActor,
   getAccountSellByIdV2,
   getAllAccountBuyerV2,
-  getAllAccountSellV2,
   markAccountSellV2,
   updateAccountSellV2,
 } from '@/services/Partner/api';
@@ -31,7 +26,6 @@ import AccountDetailDrawer from './components/AccountDetailDrawer';
 import AccountSellForm from './components/AccountSellForm';
 import AccountStatsCards from './components/AccountStatsCards';
 import AccountTable from './components/AccountTable';
-import ConfirmSellSection from './components/ConfirmSellSection';
 import type { AccountFormValue, AccountItem, AccountStats } from './types';
 
 const parseData = <T,>(response: any): T | undefined => {
@@ -40,13 +34,13 @@ const parseData = <T,>(response: any): T | undefined => {
 
 const getAuthToken = () => localStorage.getItem('token') || localStorage.getItem('access_token') || '';
 
-const buildStats = (allAccounts: AccountItem[], boughtAccounts: AccountItem[]): AccountStats => {
-  const selling = allAccounts.filter((item) => item.status !== 'sold').length;
-  const sold = allAccounts.filter((item) => item.status === 'sold').length;
+const buildStats = (myAccounts: AccountItem[], boughtAccounts: AccountItem[]): AccountStats => {
+  const selling = myAccounts.filter((item) => item.status !== 'sold').length;
+  const sold = myAccounts.filter((item) => item.status === 'sold').length;
   const totalValue = boughtAccounts.reduce((sum, item) => sum + Number(item.price || 0), 0);
 
   return {
-    total: allAccounts.length,
+    total: myAccounts.length,
     selling,
     sold,
     bought: boughtAccounts.length,
@@ -57,13 +51,10 @@ const buildStats = (allAccounts: AccountItem[], boughtAccounts: AccountItem[]): 
 const QuanLyTaiKhoan = () => {
   const token = getAuthToken();
   const [searchParams] = useSearchParams();
-
-  const [allAccounts, setAllAccounts] = useState<AccountItem[]>([]);
   const [myAccounts, setMyAccounts] = useState<AccountItem[]>([]);
   const [myBoughtAccounts, setMyBoughtAccounts] = useState<AccountItem[]>([]);
   const [activeTab, setActiveTab] = useState('market');
 
-  const [loadingAll, setLoadingAll] = useState(false);
   const [loadingMine, setLoadingMine] = useState(false);
   const [loadingBought, setLoadingBought] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -74,12 +65,9 @@ const QuanLyTaiKhoan = () => {
   const [editingAccount, setEditingAccount] = useState<AccountItem | null>(null);
   const [editOpen, setEditOpen] = useState(false);
 
-  const [ownerType, setOwnerType] = useState<'partner' | 'admin'>('partner');
-  const [ownerId, setOwnerId] = useState<number | undefined>();
-  const [ownerStatus, setOwnerStatus] = useState<string | undefined>();
   const [searchId, setSearchId] = useState<number | undefined>();
 
-  const stats = useMemo(() => buildStats(allAccounts, myBoughtAccounts), [allAccounts, myBoughtAccounts]);
+  const stats = useMemo(() => buildStats(myAccounts, myBoughtAccounts), [myAccounts, myBoughtAccounts]);
 
   const openDetail = async (record: AccountItem) => {
     try {
@@ -94,31 +82,21 @@ const QuanLyTaiKhoan = () => {
     }
   };
 
-  const loadAllAccounts = async () => {
-    setLoadingAll(true);
-    try {
-      const response = await getAllAccountSellV2(token);
-      const data = parseData<AccountItem[]>(response) || [];
-      setAllAccounts(Array.isArray(data) ? data : []);
-    } catch {
-      message.error('Không thể tải kho account của hệ thống');
-    } finally {
-      setLoadingAll(false);
-    }
-  };
-
   const loadMyAccounts = async () => {
     setLoadingMine(true);
+    const auth_id_str = localStorage.getItem('auth_id');
+    const auth_id = auth_id_str ? Number(auth_id_str) : undefined;
+
     try {
       const params = {
-        partnerId: ownerType === 'partner' ? ownerId : undefined,
-        adminId: ownerType === 'admin' ? ownerId : undefined,
-        status: ownerStatus,
+        partner_id: auth_id,
       };
 
       const response = await getAccountSellByActor(params, token);
-      const data = parseData<AccountItem[]>(response) || [];
-      setMyAccounts(Array.isArray(data) ? data : []);
+      const data: any = parseData(response) || {};
+      const accountsArray = data.accounts || [];
+
+      setMyAccounts(Array.isArray(accountsArray) ? accountsArray : []);
     } catch {
       message.error('Không thể tải danh sách account theo partner/admin');
     } finally {
@@ -126,17 +104,16 @@ const QuanLyTaiKhoan = () => {
     }
   };
 
+
   const loadBoughtAccounts = async () => {
     setLoadingBought(true);
     try {
-      const params = {
-        partnerId: ownerType === 'partner' ? ownerId : undefined,
-        adminId: ownerType === 'admin' ? ownerId : undefined,
-      };
+      const response = await getAllAccountBuyerV2({}, token);
+      const data: any = parseData(response) || {};
 
-      const response = await getAllAccountBuyerV2(params, token);
-      const data = parseData<AccountItem[]>(response) || [];
-      setMyBoughtAccounts(Array.isArray(data) ? data : []);
+      const accountsArray = data.accounts || [];
+
+      setMyBoughtAccounts(Array.isArray(accountsArray) ? accountsArray : []);
     } catch {
       message.error('Không thể tải danh sách account đã mua');
     } finally {
@@ -145,7 +122,7 @@ const QuanLyTaiKhoan = () => {
   };
 
   const refreshAll = async () => {
-    await Promise.all([loadAllAccounts(), loadMyAccounts(), loadBoughtAccounts()]);
+    await Promise.all([loadMyAccounts(), loadBoughtAccounts()]);
   };
 
   const handleCreate = async (values: AccountFormValue) => {
@@ -156,19 +133,6 @@ const QuanLyTaiKhoan = () => {
       await refreshAll();
     } catch {
       message.error('Đăng bán account thất bại');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleConfirmByEmail = async (confirmToken: string) => {
-    setSubmitting(true);
-    try {
-      await confirmSellByEmailLink(confirmToken, token);
-      message.success('Xác nhận đăng bán thành công');
-      await refreshAll();
-    } catch {
-      message.error('Xác nhận đăng bán thất bại');
     } finally {
       setSubmitting(false);
     }
@@ -269,7 +233,6 @@ const QuanLyTaiKhoan = () => {
   useEffect(() => {
     const queryToken = searchParams.get('token');
     if (!queryToken) return;
-    handleConfirmByEmail(queryToken);
   }, [searchParams]);
 
   return (
@@ -284,7 +247,7 @@ const QuanLyTaiKhoan = () => {
           </Typography.Text>
         </Col>
         <Col>
-          <Button onClick={refreshAll} loading={loadingAll || loadingMine || loadingBought}>
+          <Button onClick={refreshAll} loading={loadingMine || loadingBought}>
             Làm mới dữ liệu
           </Button>
         </Col>
@@ -297,66 +260,19 @@ const QuanLyTaiKhoan = () => {
         onChange={setActiveTab}
         items={[
           {
-            key: 'market',
-            label: 'Sàn account',
-            children: (
-              <AccountTable
-                data={allAccounts}
-                loading={loadingAll || submitting}
-                allowBuy
-                allowMarkSold
-                onViewDetail={openDetail}
-                onBuy={handleBuy}
-                onMarkSold={handleMarkSold}
-              />
-            ),
-          },
-          {
             key: 'sell',
             label: 'Đăng bán account',
             children: (
               <>
-                <ConfirmSellSection loading={submitting} onConfirm={handleConfirmByEmail} />
                 <AccountSellForm onSubmit={handleCreate} loading={submitting} mode='create' />
               </>
             ),
           },
           {
             key: 'inventory',
-            label: 'Kho bán theo partner/admin',
+            label: 'Kho bán acc của tôi',
             children: (
               <>
-                <Card style={{ marginBottom: 12 }}>
-                  <Space wrap size={12}>
-                    <Radio.Group value={ownerType} onChange={(e) => setOwnerType(e.target.value)}>
-                      <Radio.Button value='partner'>Partner</Radio.Button>
-                      <Radio.Button value='admin'>Admin</Radio.Button>
-                    </Radio.Group>
-
-                    <InputNumber
-                      min={1}
-                      value={ownerId}
-                      onChange={(value) => setOwnerId((value as number) || undefined)}
-                      placeholder='Nhập ID partner/admin'
-                    />
-
-                    <Input
-                      style={{ width: 220 }}
-                      value={ownerStatus}
-                      onChange={(e) => setOwnerStatus(e.target.value || undefined)}
-                      placeholder='Lọc trạng thái (selling/sold)'
-                      allowClear
-                    />
-
-                    <Button onClick={loadMyAccounts} loading={loadingMine} type='primary' ghost>
-                      Lọc kho bán
-                    </Button>
-                    <Button onClick={loadBoughtAccounts} loading={loadingBought}>
-                      Lọc kho mua cùng điều kiện
-                    </Button>
-                  </Space>
-                </Card>
-
                 <AccountTable
                   data={myAccounts}
                   loading={loadingMine || submitting}
@@ -427,12 +343,12 @@ const QuanLyTaiKhoan = () => {
           initialValues={
             editingAccount
               ? {
-                  username: editingAccount.username,
-                  password: '',
-                  url: editingAccount.url,
-                  description: editingAccount.description,
-                  price: Number(editingAccount.price || 0),
-                }
+                username: editingAccount.username,
+                password: '',
+                url: editingAccount.url,
+                description: editingAccount.description,
+                price: Number(editingAccount.price || 0),
+              }
               : undefined
           }
           onSubmit={handleUpdate}

@@ -20,26 +20,19 @@ export interface AccountSellUpdatePayload {
 }
 
 export interface AccountSellListParams {
-    partnerId?: number;
-    adminId?: number;
-    status?: AccountSellStatus;
+    partner_id?: number;
+
 }
 
 export interface AccountBuyerListParams {
-    partnerId?: number;
-    adminId?: number;
+    partner_id?: number;
+    admin_id?: number;
 }
 
 export async function createAccountSellV2(payload: AccountSellPayload, token: string) {
     return axios.post(`${ipNR}/partner/create-account-sell`, payload, getAuthHeader(token));
 }
 
-export async function confirmSellByEmailLink(confirmToken: string, token: string) {
-    return axios.get(`${ipNR}/partner/confirm-sell`, {
-        ...getAuthHeader(token),
-        params: { token: confirmToken },
-    });
-}
 
 export async function updateAccountSellV2(payload: AccountSellUpdatePayload, token: string) {
     return axios.patch(`${ipNR}/partner/update-account-sell`, payload, getAuthHeader(token));
@@ -52,9 +45,6 @@ export async function deleteAccountSellV2(id: number, token: string) {
     });
 }
 
-export async function getAllAccountSellV2(token: string) {
-    return axios.get(`${ipNR}/partner/all-account-sell`, getAuthHeader(token));
-}
 
 export async function getAccountSellByActor(params: AccountSellListParams, token: string) {
     return axios.get(`${ipNR}/partner/account-sell-by-partner`, {
@@ -94,13 +84,6 @@ export async function createAccountSell(
     return createAccountSellV2({ username, password: String(password), url, description, price }, token);
 }
 
-export async function confirmSell(token: string, confirmToken?: string) {
-    if (confirmToken) {
-        return confirmSellByEmailLink(confirmToken, token);
-    }
-
-    return axios.get(`${ipNR}/partner/confirm-sell`, getAuthHeader(token));
-}
 
 export async function updateAccountSell(
     id: number,
@@ -116,9 +99,7 @@ export async function deleteAccountSell(id: number, token: string) {
     return deleteAccountSellV2(id, token);
 }
 
-export async function getAllAccountSell(token: string) {
-    return getAllAccountSellV2(token);
-}
+
 
 export async function getAccountSellByPartner(token: string) {
     return getAccountSellByActor({}, token);

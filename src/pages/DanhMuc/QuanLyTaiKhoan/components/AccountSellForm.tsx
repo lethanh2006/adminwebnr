@@ -70,7 +70,6 @@ const AccountSellForm = ({
             min={1000}
             step={1000}
             formatter={(value) => `${value ?? ''}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
-            parser={(value) => Number((value || '').replace(/\./g, ''))}
             placeholder='Ví dụ: 150000'
           />
         </Form.Item>

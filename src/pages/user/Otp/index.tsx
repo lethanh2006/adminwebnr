@@ -30,6 +30,7 @@ const Otp: React.FC = () => {
 
             if (res?.data?.access_token) {
                 localStorage.setItem('access_token', res.data.access_token);
+                localStorage.setItem('auth_id', res.data.auth_id);
 
                 setInitialState({
                     ...initialState,

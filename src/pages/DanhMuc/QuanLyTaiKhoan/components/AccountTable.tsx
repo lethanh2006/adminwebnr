@@ -1,4 +1,4 @@
-import { Button, Popconfirm, Space, Table, Tag, Tooltip, Typography } from 'antd';
+import { Button, Popconfirm, Space, Table, Tag, Tooltip, Typography, Image } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from '@/utils/dayjs';
 import type { AccountItem } from '../types';
@@ -18,9 +18,11 @@ interface AccountTableProps {
 }
 
 const getStatusColor = (status?: string) => {
-  if (status === 'sold') return 'green';
-  if (status === 'pending') return 'gold';
-  return 'blue';
+  const s = status?.toLowerCase();
+  if (s === 'sold') return 'green';
+  if (s === 'active') return 'blue';
+  if (s === 'pending') return 'gold';
+  return 'default';
 };
 
 const formatDate = (value?: string) => {
@@ -47,25 +49,45 @@ const AccountTable = ({
       dataIndex: 'id',
       width: 72,
       fixed: 'left',
+      align: 'center',
     },
     {
-      title: 'Tài khoản',
-      dataIndex: 'username',
-      width: 180,
+      title: 'Hình ảnh',
+      dataIndex: 'url',
+      width: 100,
       fixed: 'left',
-      render: (value: string) => <Typography.Text strong>{value || '-'}</Typography.Text>,
+      align: 'center',
+      render: (url: string) => (
+        <Image
+          src={url}
+          alt="Account"
+          width={64}
+          height={64}
+          style={{ objectFit: 'cover', borderRadius: 8 }}
+          fallback="https://placehold.co/64x64/EEE/31343C?text=No+Image" // Hiển thị ảnh thay thế nếu link không phải là file ảnh hợp lệ
+          preview={{ mask: 'Xem' }}
+        />
+      ),
     },
     {
       title: 'Giá bán',
       dataIndex: 'price',
       width: 140,
-      render: (value: number) => `${Number(value || 0).toLocaleString('vi-VN')} VNĐ`,
+      render: (value: number) => (
+        <Typography.Text strong style={{ color: '#cf1322' }}>
+          {Number(value || 0).toLocaleString('vi-VN')} đ
+        </Typography.Text>
+      ),
     },
     {
       title: 'Trạng thái',
       dataIndex: 'status',
       width: 120,
-      render: (status: string) => <Tag color={getStatusColor(status)}>{status || 'selling'}</Tag>,
+      render: (status: string) => (
+        <Tag color={getStatusColor(status)}>
+          {(status || 'UNKNOWN').toUpperCase()}
+        </Tag>
+      ),
     },
     {
       title: 'Mô tả',
@@ -73,22 +95,9 @@ const AccountTable = ({
       ellipsis: true,
       render: (value: string) => (
         <Tooltip title={value || '-'}>
-          <span>{value || '-'}</span>
+          <span style={{ color: '#595959' }}>{value || '-'}</span>
         </Tooltip>
       ),
-    },
-    {
-      title: 'Link',
-      dataIndex: 'url',
-      width: 180,
-      render: (value: string) =>
-        value ? (
-          <Typography.Link href={value} target='_blank'>
-            Mở liên kết
-          </Typography.Link>
-        ) : (
-          '-'
-        ),
     },
     {
       title: 'Ngày tạo',
@@ -103,36 +112,36 @@ const AccountTable = ({
       fixed: 'right',
       render: (_, record) => (
         <Space wrap>
-          <Button size='small' onClick={() => onViewDetail(record)}>
+          <Button size="small" onClick={() => onViewDetail(record)}>
             Chi tiết
           </Button>
 
           {allowEdit && onEdit && (
-            <Button size='small' onClick={() => onEdit(record)}>
-              Cập nhật
+            <Button size="small" onClick={() => onEdit(record)}>
+              Sửa
             </Button>
           )}
 
-          {allowMarkSold && onMarkSold && record.status !== 'sold' && (
-            <Button size='small' type='primary' ghost onClick={() => onMarkSold(record)}>
-              Đánh dấu đã bán
+          {allowMarkSold && onMarkSold && record.status?.toLowerCase() !== 'sold' && (
+            <Button size="small" type="primary" ghost onClick={() => onMarkSold(record)}>
+              Đã bán
             </Button>
           )}
 
-          {allowBuy && onBuy && record.status !== 'sold' && (
-            <Button size='small' type='primary' onClick={() => onBuy(record)}>
-              Mua account
+          {allowBuy && onBuy && record.status?.toLowerCase() !== 'sold' && (
+            <Button size="small" type="primary" onClick={() => onBuy(record)}>
+              Mua ngay
             </Button>
           )}
 
           {allowDelete && onDelete && (
             <Popconfirm
-              title='Bạn có chắc muốn xóa account này?'
-              okText='Xóa'
-              cancelText='Hủy'
+              title="Bạn có chắc muốn xóa account này?"
+              okText="Xóa"
+              cancelText="Hủy"
               onConfirm={() => onDelete(record)}
             >
-              <Button danger size='small'>
+              <Button danger size="small">
                 Xóa
               </Button>
             </Popconfirm>
@@ -144,13 +153,13 @@ const AccountTable = ({
 
   return (
     <Table
-      rowKey='id'
+      rowKey="id"
       bordered
       columns={columns}
       dataSource={data}
       loading={loading}
       pagination={{ pageSize: 10, showSizeChanger: true }}
-      scroll={{ x: 1280 }}
+      scroll={{ x: 1000 }}
     />
   );
 };
