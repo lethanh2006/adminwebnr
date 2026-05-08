@@ -44,3 +44,31 @@ export interface PlayerProfileResponse {
 export async function getPlayerProfile(id: number | string, token?: string) {
   return axios.get<PlayerProfileResponse>(`${ipNR}/player_manager/profile/${id}`, getAuthHeader(token));
 }
+
+export interface SendEmailToUserRequestDto {
+  who: string;
+  title: string;
+  content: string;
+}
+
+export async function sendEmailUser(payload: SendEmailToUserRequestDto, token?: string) {
+  return axios.post(`${ipNR}/player_manager/send-email`, payload, getAuthHeader(token));
+}
+
+export interface TemporaryBanRequestDto {
+  userId: number;
+  phut: number;
+  why: string;
+}
+
+export async function temporaryBanUser(payload: TemporaryBanRequestDto, token?: string) {
+  return axios.post(`${ipNR}/player_manager/temporary-ban`, payload, getAuthHeader(token));
+}
+
+export async function unbanUser(userId: number | string, token?: string) {
+  return axios.delete(`${ipNR}/player_manager/temporary-ban/${userId}`, getAuthHeader(token));
+}
+
+export async function getBannedUsers(token?: string) {
+  return axios.get(`${ipNR}/player_manager/temporary-ban-all`, getAuthHeader(token));
+}
