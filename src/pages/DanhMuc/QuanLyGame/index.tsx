@@ -12,12 +12,12 @@ const { Title, Text } = Typography;
 
 const QuanLyGame = () => {
   const [loading, setLoading] = useState(false);
-  const [playerData, setPlayerData] = useState<PlayerProfileResponse['user'] | null>(null);
+  const [playerData, setPlayerData] = useState<(PlayerProfileResponse['user'] & { username?: string }) | null>(null);
 
- 
+
   const [isEmailModalVisible, setIsEmailModalVisible] = useState(false);
   const [isBanModalVisible, setIsBanModalVisible] = useState(false);
-  
+
   const [emailForm] = Form.useForm();
   const [banForm] = Form.useForm();
 
@@ -31,10 +31,12 @@ const QuanLyGame = () => {
     setLoading(true);
     try {
       const res = await getPlayerProfile(value);
-      const userData = (res as any)?.data?.user || (res as any)?.user || (res as any)?.data || null;
-      
+      const rawData = (res as any)?.data || (res as any);
+      const userData = rawData?.user || rawData?.data || null;
+      const username = rawData?.username || '';
+
       if (userData && userData.id !== undefined) {
-        setPlayerData(userData);
+        setPlayerData({ ...userData, username });
         message.success('Tải thông tin người chơi thành công');
       } else {
         message.error('Không tìm thấy thông tin người dùng với ID này');
@@ -53,7 +55,7 @@ const QuanLyGame = () => {
     try {
       setLoading(true);
       await sendEmailUser({
-        who: String(playerData.id),
+        who: playerData.username || String(playerData.id),
         title: values.title,
         content: values.content,
       });
@@ -102,7 +104,7 @@ const QuanLyGame = () => {
   };
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
+    <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto', minWidth: 1200 }}>
       <Tabs
         defaultActiveKey="quan-ly"
         items={[
@@ -133,7 +135,7 @@ const QuanLyGame = () => {
 
                 <Spin spinning={loading} tip="Đang tải dữ liệu...">
                   {playerData ? (
-                    <PlayerDetail 
+                    <PlayerDetail
                       playerData={playerData}
                       onSendEmail={() => setIsEmailModalVisible(true)}
                       onBan={() => setIsBanModalVisible(true)}
@@ -156,7 +158,7 @@ const QuanLyGame = () => {
         ]}
       />
 
-      <ActionModals 
+      <ActionModals
         isEmailVisible={isEmailModalVisible}
         isBanVisible={isBanModalVisible}
         loading={loading}

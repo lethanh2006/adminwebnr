@@ -77,14 +77,14 @@ export const BanList = () => {
   });
 
   return (
-    <Card bordered={false} className="shadow-sm">
+    <Card bordered={false} className="shadow-sm" style={{ width: '100%', minHeight: 400, minWidth: 1200 }}>
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Title level={4} style={{ margin: 0 }}>Danh sách đang bị khóa</Title>
         <Button icon={<SearchOutlined />} onClick={fetchBannedUsers} loading={loadingBanned}>Làm mới</Button>
       </div>
-      <Table 
-        columns={columns} 
-        dataSource={normalizedData} 
+      <Table
+        columns={columns}
+        dataSource={normalizedData}
         loading={loadingBanned}
         pagination={{ pageSize: 10 }}
       />

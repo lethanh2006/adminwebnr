@@ -39,6 +39,7 @@ export interface PlayerProfileResponse {
     auth_id: number;
     gameName: string;
   };
+  username: string;
 }
 
 export async function getPlayerProfile(id: number | string, token?: string) {
