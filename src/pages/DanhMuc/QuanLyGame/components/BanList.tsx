@@ -13,7 +13,7 @@ export const BanList = () => {
     setLoadingBanned(true);
     try {
       const res = await getBannedUsers();
-      const data = (res as any)?.data?.data || (res as any)?.data || [];
+      const data = (res as any)?.data?.bans || (res as any)?.data || [];
       if (Array.isArray(data)) {
         setBannedUsers(data);
       }
@@ -36,15 +36,32 @@ export const BanList = () => {
       render: (text: any) => <Text strong>{text}</Text>,
     },
     {
-      title: 'Thời gian (Phút)',
-      dataIndex: 'phut',
-      key: 'phut',
-      render: (text: any) => <Tag color="volcano">{text} phút</Tag>,
+      title: 'Người Ban',
+      dataIndex: 'admin',
+      key: 'admin',
+      render: (text: any) => <Tag color="blue">{text}</Tag>
+    },
+    {
+      title: 'Bắt đầu',
+      dataIndex: 'startAt',
+      key: 'startAt',
+    },
+    {
+      title: 'Kết thúc',
+      dataIndex: 'expireAt',
+      key: 'expireAt',
+      render: (text: any, record: any) => (
+        <div>
+          <div style={{ fontWeight: 500 }}>{text}</div>
+          {record.ttl ? <Text type="secondary" style={{ fontSize: 12 }}>Còn {record.ttl}s</Text> : null}
+        </div>
+      )
     },
     {
       title: 'Lý do',
       dataIndex: 'why',
       key: 'why',
+      render: (text: any) => <Text type="danger">{text}</Text>
     },
     {
       title: 'Hành động',
@@ -52,14 +69,15 @@ export const BanList = () => {
       render: (_: any, record: any) => (
         <Popconfirm
           title="Xác nhận mở khóa"
-          description={`Mở khóa cho User ID ${record.userId || record.id}?`}
+          description={`Mở khóa cho User ID ${record.userId}?`}
           onConfirm={async () => {
             try {
-              await unbanUser(record.userId || record.id);
+              await unbanUser(record.userId);
               message.success('Mở khóa thành công!');
               fetchBannedUsers();
             } catch (e) {
               console.error(e);
+              message.error('Có lỗi xảy ra!');
             }
           }}
           okText="Đồng ý"
@@ -72,8 +90,15 @@ export const BanList = () => {
   ];
 
   const normalizedData = bannedUsers.map((u: any, idx: number) => {
-    if (typeof u === 'number' || typeof u === 'string') return { key: idx, userId: u, phut: 'N/A', why: 'N/A' };
-    return { ...u, key: u.id || u.userId || idx };
+    return { 
+      key: u.userId || idx, 
+      userId: u.userId, 
+      admin: u.data?.admin || 'N/A',
+      why: u.data?.why || 'N/A',
+      startAt: u.data?.startAt || 'N/A',
+      expireAt: u.data?.expireAt || 'N/A',
+      ttl: u.ttl,
+    };
   });
 
   return (
