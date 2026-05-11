@@ -28,28 +28,32 @@ export const BanList = () => {
     fetchBannedUsers();
   }, []);
 
-  const columns = [
+  const columns: any = [
     {
       title: 'User ID',
       dataIndex: 'userId',
       key: 'userId',
+      align: 'center',
       render: (text: any) => <Text strong>{text}</Text>,
     },
     {
       title: 'Người Ban',
       dataIndex: 'admin',
       key: 'admin',
+      align: 'center',
       render: (text: any) => <Tag color="blue">{text}</Tag>
     },
     {
       title: 'Bắt đầu',
       dataIndex: 'startAt',
       key: 'startAt',
+      align: 'center',
     },
     {
       title: 'Kết thúc',
       dataIndex: 'expireAt',
       key: 'expireAt',
+      align: 'center',
       render: (text: any, record: any) => (
         <div>
           <div style={{ fontWeight: 500 }}>{text}</div>
@@ -61,11 +65,13 @@ export const BanList = () => {
       title: 'Lý do',
       dataIndex: 'why',
       key: 'why',
+      align: 'center',
       render: (text: any) => <Text type="danger">{text}</Text>
     },
     {
       title: 'Hành động',
       key: 'action',
+      align: 'center',
       render: (_: any, record: any) => (
         <Popconfirm
           title="Xác nhận mở khóa"
