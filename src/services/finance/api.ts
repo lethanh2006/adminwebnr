@@ -10,3 +10,7 @@ import { getAuthHeader } from '@/utils/apiHelper';
 export async function getFinanceAllRecord(token: string) {
     return axios.get(`${ipNR}/finance/all-record`, getAuthHeader(token));
 }
+
+export async function getSystemCashFlow(token: string) {
+    return axios.get(`${ipNR}/finance/system-cash-flow`, getAuthHeader(token));
+}
