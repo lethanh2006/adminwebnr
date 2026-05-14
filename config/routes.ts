@@ -61,14 +61,14 @@
 				component: './DanhMuc/QuanLyTaiKhoan',
 			},
 			{
-				name: 'Quản Lý Game',
-				path: 'quan-ly-game',
-				component: './DanhMuc/QuanLyGame',
-			},
-			{
 				name: 'Quản Lý User',
 				path: 'quan-ly-user',
 				component: './DanhMuc/QuanLyUser',
+			},
+			{
+				name: 'Quản Lý Game',
+				path: 'quan-ly-game',
+				component: './DanhMuc/QuanLyGame',
 			},
 		],
 	},
