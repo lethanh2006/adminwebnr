@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Spin, message, Row, Col } from 'antd';
+import { Card, Spin, message } from 'antd';
 import { getMaps, MapData } from '@/services/GameManager/api';
 
 interface MapListProps {
@@ -19,7 +19,6 @@ const MapList: React.FC<MapListProps> = ({ selectedMapId, onSelectMap }) => {
     setLoading(true);
     try {
       const response = await getMaps();
-      // Depending on axios configuration, response might be the data directly or nested
       const data = response?.data || response;
       if (data && data.maps) {
         setMaps(data.maps);
@@ -44,29 +43,62 @@ const MapList: React.FC<MapListProps> = ({ selectedMapId, onSelectMap }) => {
 
   return (
     <div style={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto', paddingRight: '10px' }}>
-      <Row gutter={[16, 16]}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {maps.map((map) => (
-          <Col xs={24} sm={12} md={24} lg={12} xl={8} key={map.id}>
-            <Card
-              hoverable
-              size="small"
-              onClick={() => onSelectMap(map)}
-              style={{
-                borderColor: selectedMapId === map.id ? '#1890ff' : '#f0f0f0',
-                borderWidth: selectedMapId === map.id ? '2px' : '1px',
-                backgroundColor: selectedMapId === map.id ? '#e6f7ff' : '#fff',
+          <Card
+            key={map.id}
+            hoverable
+            size="small"
+            onClick={() => onSelectMap(map)}
+            style={{
+              borderColor: selectedMapId === map.id ? '#1890ff' : '#f0f0f0',
+              borderWidth: selectedMapId === map.id ? '2px' : '1px',
+              backgroundColor: selectedMapId === map.id ? '#e6f7ff' : '#fff',
+              transition: 'all 0.3s',
+              borderRadius: '8px',
+              cursor: 'pointer',
+            }}
+            bodyStyle={{ padding: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}
+          >
+            {/* Khung chứa ảnh placeholder */}
+            <div 
+              style={{ 
+                width: '50px', 
+                height: '50px', 
+                backgroundColor: selectedMapId === map.id ? '#bae0ff' : '#f5f5f5', 
+                borderRadius: '6px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                flexShrink: 0,
+                border: selectedMapId === map.id ? '1px solid #91caff' : '1px dashed #d9d9d9',
                 transition: 'all 0.3s',
               }}
-              bodyStyle={{ padding: '12px' }}
             >
-              <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px' }}>
+              <span style={{ fontSize: '10px', color: selectedMapId === map.id ? '#0958d9' : '#bfbfbf', fontWeight: 500 }}>Ảnh</span>
+            </div>
+            
+            {/* Thông tin map */}
+            <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '12px', color: '#8c8c8c', marginBottom: '2px' }}>
                 ID: {map.id}
               </div>
-              <div style={{ color: '#595959', fontSize: '16px' }}>{map.ten}</div>
-            </Card>
-          </Col>
+              <div 
+                style={{ 
+                  color: selectedMapId === map.id ? '#0958d9' : '#262626', 
+                  fontSize: '15px', 
+                  fontWeight: 500,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
+                {map.ten}
+              </div>
+            </div>
+          </Card>
         ))}
-      </Row>
+      </div>
     </div>
   );
 };

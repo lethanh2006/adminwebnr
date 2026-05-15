@@ -21,7 +21,6 @@ const NpcList: React.FC<NpcListProps> = ({ map }) => {
     setLoading(true);
     try {
       const response = await getNpcsByMap(mapId);
-      // Depending on axios configuration, response might be the data directly or nested
       const data = response?.data || response;
       if (data && data.npcs) {
         setNpcs(data.npcs);
@@ -66,7 +65,7 @@ const NpcList: React.FC<NpcListProps> = ({ map }) => {
         else if (text === 'CAYDAU') color = 'green';
         else if (text === 'RUONGDO') color = 'gold';
         else if (text === 'DUIGA') color = 'volcano';
-        
+
         return <Tag color={color}>{text}</Tag>;
       },
     },
@@ -100,7 +99,7 @@ const NpcList: React.FC<NpcListProps> = ({ map }) => {
       <div style={{ marginBottom: '16px', fontSize: '18px', fontWeight: 'bold' }}>
         Danh sách NPC tại: <span style={{ color: '#1890ff' }}>{map.ten}</span> (ID: {map.id})
       </div>
-      
+
       {loading ? (
         <div style={{ textAlign: 'center', padding: '50px' }}>
           <Spin tip="Đang tải danh sách NPC..." />
