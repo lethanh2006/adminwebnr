@@ -27,6 +27,32 @@ export interface NpcResponse {
   npcs: NpcData[];
 }
 
+export interface NpcBase {
+  id: number;
+  ten: string;
+  loai: string;
+}
+
+export interface NpcBaseResponse {
+  npcs: NpcBase[];
+}
+
+export interface CreateNpcSpawnDto {
+  npc_base_id: number;
+  map_id: number;
+  x: number;
+  y: number;
+  is_active: boolean;
+}
+
+export interface UpdateNpcSpawnDto {
+  id: number;
+  map_id: number;
+  x?: number;
+  y?: number;
+  is_active?: boolean;
+}
+
 export async function getMaps(token?: string) {
   return axios.get<MapResponse>(`${ipNR}/game-data/map`, getAuthHeader(token));
 }
@@ -36,5 +62,24 @@ export async function getNpcsByMap(mapId: number, token?: string) {
   return axios.get<NpcResponse>(`${ipNR}/game-data/map/npcs`, {
     ...authHeader,
     params: { map_id: mapId },
+  });
+}
+
+export async function getNpcBases(token?: string) {
+  return axios.get<NpcBaseResponse>(`${ipNR}/game-data/npc-base`, getAuthHeader(token));
+}
+
+export async function createNpcSpawn(data: CreateNpcSpawnDto, token?: string) {
+  return axios.post(`${ipNR}/game-data/npc-spawn`, data, getAuthHeader(token));
+}
+
+export async function updateNpcSpawn(data: UpdateNpcSpawnDto, token?: string) {
+  return axios.patch(`${ipNR}/game-data/npc-spawn`, data, getAuthHeader(token));
+}
+
+export async function deleteNpcSpawn(id: number, token?: string) {
+  return axios.delete(`${ipNR}/game-data/npc-spawn`, {
+    ...getAuthHeader(token),
+    params: { id },
   });
 }
