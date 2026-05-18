@@ -1,6 +1,6 @@
 import type { ItemBase, LongValue, NpcBase, NpcShopItem } from '@/services/GameManager/api';
 import dayjs from '@/utils/dayjs';
-import { Col, DatePicker, Form, Input, InputNumber, Modal, Row, Select, Switch } from 'antd';
+import { Col, DatePicker, Form, InputNumber, Modal, Row, Select, Switch } from 'antd';
 import type { Dayjs } from 'dayjs';
 import React, { useEffect } from 'react';
 
@@ -38,6 +38,12 @@ interface NpcShopFormModalProps {
 const CURRENCY_OPTIONS = [
 	{ value: 'NGOC', label: 'NGOC' },
 	{ value: 'VANG', label: 'VANG' },
+];
+
+const TAB_OPTIONS = [
+	{ value: 'AO_QUAN', label: 'AO_QUAN' },
+	{ value: 'PHU_KIEN', label: 'PHU_KIEN' },
+	{ value: 'DAC_BIET', label: 'DAC_BIET' },
 ];
 
 const toLongNumber = (value?: number | LongValue) => {
@@ -88,7 +94,7 @@ const NpcShopFormModal: React.FC<NpcShopFormModalProps> = ({
 			is_active: true,
 			gia: 1000,
 			loaiTien: 'NGOC',
-			tab: 'DAC_BIET',
+			tab: 'AO_QUAN',
 			start_at: start,
 			end_at: start.add(7, 'day'),
 		});
@@ -174,8 +180,8 @@ const NpcShopFormModal: React.FC<NpcShopFormModalProps> = ({
 						</Form.Item>
 					</Col>
 					<Col xs={24} md={8}>
-						<Form.Item name='tab' label='Tab hiển thị' rules={[{ required: true, message: 'Vui lòng nhập tab' }]}>
-							<Input placeholder='VD: DAC BIET' />
+						<Form.Item name='tab' label='Tab hiển thị' rules={[{ required: true, message: 'Vui lòng chọn tab' }]}>
+							<Select options={TAB_OPTIONS} placeholder='Chọn tab hiển thị' />
 						</Form.Item>
 					</Col>
 				</Row>
