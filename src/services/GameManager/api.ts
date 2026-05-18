@@ -37,6 +37,64 @@ export interface NpcBaseResponse {
   npcs: NpcBase[];
 }
 
+export interface ItemBase {
+  id: number;
+  ten: string;
+  ma?: string;
+}
+
+export interface ItemBaseResponse {
+  items: ItemBase[];
+}
+
+export interface LongValue {
+  low: number;
+  high: number;
+  unsigned: boolean;
+}
+
+export interface NpcShopItem {
+  id: number;
+  npc_base_id: number;
+  item_base_id: number;
+  gia: number | LongValue;
+  loaiTien: string;
+  tab: string;
+  is_active: boolean;
+  start_at?: number | LongValue;
+  end_at?: number | LongValue;
+  ten_npc?: string;
+  ten_item?: string;
+  ma_item?: string;
+}
+
+export interface NpcShopResponse {
+  items: NpcShopItem[];
+}
+
+export interface CreateNpcShopDto {
+  npc_base_id: number;
+  item_base_id: number;
+  gia: number;
+  loaiTien: string;
+  tab: string;
+  is_active: boolean;
+  start_at: number;
+  end_at: number;
+}
+
+export interface UpdateNpcShopDto {
+  id: number;
+  npc_base_id?: number;
+  item_base_id?: number;
+  gia?: number;
+  loaiTien?: string;
+  tab?: string;
+  is_active?: boolean;
+  start_at?: number;
+  end_at?: number;
+}
+
 export interface CreateNpcSpawnDto {
   npc_base_id: number;
   map_id: number;
@@ -69,6 +127,10 @@ export async function getNpcBases(token?: string) {
   return axios.get<NpcBaseResponse>(`${ipNR}/game-data/npc-base`, getAuthHeader(token));
 }
 
+export async function getItemBases(token?: string) {
+  return axios.get<ItemBaseResponse>(`${ipNR}/game-data/item-base`, getAuthHeader(token));
+}
+
 export async function createNpcSpawn(data: CreateNpcSpawnDto, token?: string) {
   return axios.post(`${ipNR}/game-data/npc-spawn`, data, getAuthHeader(token));
 }
@@ -79,6 +141,28 @@ export async function updateNpcSpawn(data: UpdateNpcSpawnDto, token?: string) {
 
 export async function deleteNpcSpawn(id: number, token?: string) {
   return axios.delete(`${ipNR}/game-data/npc-spawn`, {
+    ...getAuthHeader(token),
+    params: { id },
+  });
+}
+
+export async function getNpcShopItems(npcBaseId: number, token?: string) {
+  return axios.get<NpcShopResponse>(`${ipNR}/game-data/npc-shop`, {
+    ...getAuthHeader(token),
+    params: { npc_base_id: npcBaseId },
+  });
+}
+
+export async function createNpcShopItem(data: CreateNpcShopDto, token?: string) {
+  return axios.post(`${ipNR}/game-data/npc-shop`, data, getAuthHeader(token));
+}
+
+export async function updateNpcShopItem(data: UpdateNpcShopDto, token?: string) {
+  return axios.patch(`${ipNR}/game-data/npc-shop`, data, getAuthHeader(token));
+}
+
+export async function deleteNpcShopItem(id: number, token?: string) {
+  return axios.delete(`${ipNR}/game-data/npc-shop`, {
     ...getAuthHeader(token),
     params: { id },
   });
